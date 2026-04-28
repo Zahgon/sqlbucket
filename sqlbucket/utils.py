@@ -12,22 +12,14 @@ logger = logging.getLogger()
 
 
 def n_days_ago(n):
-    return (datetime.today() - timedelta(days=n)).strftime('%Y-%m-%d')
+    pass
 
 
 def cli_variables_parser(cli_variables: list = None) -> dict:
-    variables = dict()
-
-    if not cli_variables:
-        return variables
-
-    for var in cli_variables:
-        key, value = var.split("=")
-        variables[key] = value
-    return variables
+    pass
 
 
-sqlbucket_logo = """
+sqlbucket_logo = r"""
 
            _____ ____    __    ____             __        __ 
           / ___// __ \  / /   / __ )__  _______/ /_____  / /_
@@ -38,7 +30,7 @@ sqlbucket_logo = """
         """
 
 
-integrity_logo = """
+integrity_logo = r"""
 
             ____      __                  _ __       
            /  _/___  / /____  ____ ______(_) /___  __
@@ -49,7 +41,7 @@ integrity_logo = """
 
         """
 
-success = """
+success = r"""
             
             ___|
                                                    

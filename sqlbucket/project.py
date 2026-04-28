@@ -17,140 +17,34 @@ class Project:
         macros_path: str = None
     ):
 
-        self.project_path = Path(project_path)
-        self.project_config = self.get_project_config()
-
-        self.context = ContextMerger(
-            context=context, context_from_config=self.project_config
-        ).merge()
-
-        self.env_name = self.context['e']['name']
-        self.connection_url = connection_url
-        self.connection_name = self.context['c']['name']
-
-        self.macros_path = macros_path
+        pass
 
     def configure(self, group: str = None) -> dict:
         # Setting up the jinja environment
-        jinja_env = self.create_jinja_env(folder='queries')
-
-        # The 'order' attribute in config can be an array if no group, or a
-        # dict where each key is a group name with an array as a value (the
-        # group order). If no group name is submitted, but the order is in
-        # group format, it will search for default 'main' group.
-        query_order = self.project_config["order"]
-        if type(query_order) == list:
-            if group:
-                raise OrderNotInRightFormat(
-                    f'Current config not in the right format for group orders'
-                )
-        elif type(query_order) == dict:
-            if not group:
-                group = 'main'
-            if group not in query_order:
-                raise GroupNotFound(
-                    f'Group "{group}" not found in order config.'
-                )
-            query_order = query_order[group]
-
-        # Now rendering the queries.
-        queries = dict()
-        for query in query_order:
-            template = jinja_env.get_template(query)
-            queries[query] = template.render(**self.context)
-
-        return {
-            "order": query_order,
-            "queries": queries,
-            "context": self.context,
-            "connection_url": self.connection_url,
-            "connection_name": self.connection_name,
-            "project_name": str(self.project_path).split('/')[-1],
-            "connection_query": self.get_connection_query()
-        }
+        pass
 
     def configure_integrity(self) -> dict:
         # Setting up the jinja environment
-        jinja_env = self.create_jinja_env(folder='integrity')
-
-        order = jinja_env.list_templates('sql')
-        queries = dict()
-        for query in order:
-            template = jinja_env.get_template(query)
-            queries[query] = template.render(**self.context)
-
-        return {
-            "order": order,
-            "queries": queries,
-            "context": self.context,
-            "connection_url": self.connection_url,
-            "connection_name": self.connection_name,
-            "project_name": str(self.project_path).split('/')[-1],
-            "connection_query": self.get_connection_query()
-        }
+        pass
 
     def send_msg(run_func):
 
-        def wrapper(self, *args, **kwargs):
-
-            silent = kwargs.pop("silent", False)
-
-            if silent:
-                run_func(self, *args, **kwargs)
-            else:
-                group = kwargs.get("group")
-                config = self.configure(group)
-
-                if 'context' in config and 'f' in config['context']:
-                    funcs_reg = config['context']['f']
-                    start_msg = funcs_reg.get('start_msg')
-                    end_msg = funcs_reg.get('end_msg')
-
-                    try:
-                        if start_msg: start_msg(**config)
-                        run_func(self, *args, **kwargs)
-                        if end_msg: end_msg(**config)
-                    except:
-                        exception_msg = funcs_reg.get('exception_msg')
-                        if exception_msg: exception_msg(**config)
-                        raise
-
-        return wrapper
+        pass
 
     @send_msg
     def run(self, group: str = None, from_step: int = 1, to_step: int = None,
             verbose: bool = False, isolation_level: str = None) -> None:
-        configuration = self.configure(group)
-        runner = ProjectRunner(
-            configuration=configuration,
-            from_step=from_step,
-            to_step=to_step,
-            verbose=verbose,
-            isolation_level=isolation_level
-        )
-        runner.run_project()
+        pass
 
     def render(self, group: str = None, from_step: int = 1,
                to_step: int = None) -> None:
-        configuration = self.configure(group)
-        runner = ProjectRunner(
-            configuration=configuration,
-            from_step=from_step,
-            to_step=to_step,
-        )
-        runner.render_queries()
+        pass
 
     def run_integrity(self, prefix: str = '', verbose: bool = False):
-        integrity_configuration = self.configure_integrity()
-        return run_integrity(
-            configuration=integrity_configuration,
-            prefix=prefix,
-            verbose=verbose
-        )
+        pass
 
     def get_project_config(self) -> dict:
-        config_path = (self.project_path / 'config.yaml').resolve()
-        return yaml.load(open(config_path, 'r').read(), Loader=yaml.FullLoader)
+        pass
 
     def get_connection_query(self) -> Optional[str]:
         """
@@ -161,25 +55,10 @@ class Project:
         :return: the connection query if any.
         """
 
-        if "connection_query" not in self.project_config:
-            return None
-
-        jinja_env = self.create_jinja_env(folder='queries')
-        template = jinja_env.get_template(
-            self.project_config['connection_query']
-        )
-        return template.render(**self.context)
+        pass
 
     def create_jinja_env(self, folder: str) -> Environment:
-        macro_folder_from_lib = Path(__file__).parent / 'macros'
-        queries_path = (Path(self.project_path) / folder).resolve()
-        search_path = [str(queries_path), str(macro_folder_from_lib)]
-        if self.macros_path:
-            search_path.append(str(self.macros_path))
-        jinja_env = Environment(loader=FileSystemLoader(
-            searchpath=search_path
-        ))
-        return jinja_env
+        pass
 
 
 class ContextMerger:
@@ -205,42 +84,16 @@ class ContextMerger:
         :param context: Context send to project by SQLBucket object.
         :param context_from_config: Context found in config.yaml of a project.
         """
-        self.context = context
-        self.context_from_config = context_from_config
+        pass
 
     def overwrite_environment_variables(self):
-        config_env_vars = self.context_from_config.get('environment_variables')
-        if not config_env_vars:
-            return
-
-        env_name = self.context['e']['name']
-        if env_name not in config_env_vars:
-            return
-
-        for key, value in config_env_vars[env_name].items():
-            self.context['e'][key] = value
+        pass
 
     def overwrite_connection_variables(self):
-        connections_vars = self.context_from_config.get('connection_variables')
-        if not connections_vars:
-            return
-
-        connection_name = self.context['c']['name']
-        if connection_name not in connections_vars:
-            return
-
-        for key, value in connections_vars[connection_name].items():
-            self.context['c'][key] = value
+        pass
 
     def overwrite_project_variables(self):
-        project_vars = self.context_from_config.get('project_variables')
-        if not project_vars:
-            return
-        for key, value in project_vars.items():
-            self.context[key] = value
+        pass
 
     def merge(self):
-        self.overwrite_environment_variables()
-        self.overwrite_connection_variables()
-        self.overwrite_project_variables()
-        return self.context
+        pass
